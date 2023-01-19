@@ -1,0 +1,38 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+char BYTE ?
+error BYTE "Incorent values",0
+
+.code
+main PROC
+	call Clrscr
+
+	call ReadChar
+	mov char,al
+
+	and char, 0Fh
+
+	cmp char, "0"
+	jb L8
+	cmp char, "9"
+	ja L8
+
+
+	mov al, char
+	call WriteChar
+	
+
+	
+
+	jmp L9
+L8:
+	mov edx, offset error
+	call WriteString
+L9:
+
+	exit
+main ENDP
+
+END main

@@ -1,0 +1,44 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+buffer BYTE 21 DUP(0) ; input buffer
+byteCount DWORD ? ; holds counter
+
+.code
+main PROC
+	call Clrscr
+
+	mov edx,OFFSET buffer ; point to the buffer
+	mov ecx,SIZEOF buffer ; specify max characters for ReadString
+	call ReadString ; input the string
+	mov byteCount,eax ; number of characters
+
+	xor esi, esi ; alebo: mov esi, 0
+L1:
+	mov al, buffer[esi]
+
+	cmp al, 0
+	je L2
+
+	call WriteChar
+
+	;call CRLF
+	mov bl, al
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteCHar
+	mov al, bl
+
+	inc esi
+
+	jmp L1
+
+L2:
+	
+
+	exit
+main ENDP
+
+END main

@@ -1,0 +1,64 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+message1 db 13, 10, "Chyba vstupu!", 0
+constant dw 10
+negative dw 0
+
+.code
+main PROC
+	call Clrscr
+
+	mov ECX, 5
+	xor BX, BX
+	xor SI, SI
+
+	call ReadChar
+	call WriteChar
+	cmp al, '-'
+	jne L9
+	mov negative, 1
+
+L1:
+	; uvodne kontroly
+	call ReadChar
+	call WriteChar
+L9:
+	cmp	al, 13
+	je ExitProgram
+	cmp al, '0'
+	jb WrongInput
+	cmp al, '9'
+	ja WrongInput
+
+	; maska na prevod znaku na desiatkovu cislicu, resp. cislo od 0..9
+	and AL, 0Fh
+
+	mov BL, AL
+	mov AX, SI
+	mul constant
+	add AX, BX
+	mov SI, AX
+
+	loop L1
+	
+	jmp ExitProgram
+
+WrongInput:
+	mov EDX, offset message1
+	call WriteString
+
+ExitProgram:
+	cmp negative, 1
+	jne TwoKomplementSkip
+	neg SI
+
+TwoKomplementSkip:
+	mov AX, SI
+	call WriteInt
+
+	exit
+main ENDP
+
+END main

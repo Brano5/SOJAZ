@@ -1,0 +1,88 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+desat dw 10
+dva dw 2
+sestnast dw 16
+buffer db 0
+
+.code
+;Vypíšte obsah registra AX v desiatkovej sústave.
+main PROC
+	call Clrscr
+
+	mov AX, 12345
+	xor ecx, ecx
+L1:
+	xor dx, dx
+	div desat
+	;maska na prevod cislice na znak
+	or dl, 30h
+	;zapis znaku do pamate
+	mov buffer[ecx], dl
+	inc ecx
+	;kontrola ci koncim delenie - ak je podiel rovny 0
+	cmp ax, 0
+	je L2
+	jmp L1
+	;cyklus na vypis znakov v opacnom poradi
+L2:
+	mov al, buffer[ecx-1]
+	call WriteChar
+	loop L2
+
+
+	mov al, 0Ah
+	call WriteChar
+
+
+	mov AX, 12345
+	xor ecx, ecx
+L3:
+	xor dx, dx
+	div dva
+	;maska na prevod cislice na znak
+	or dl, 30h
+	;zapis znaku do pamate
+	mov buffer[ecx], dl
+	inc ecx
+	;kontrola ci koncim delenie - ak je podiel rovny 0
+	cmp ax, 0
+	je L4
+	jmp L3
+	;cyklus na vypis znakov v opacnom poradi
+L4:
+	mov al, buffer[ecx-1]
+	call WriteChar
+	loop L4
+
+
+	mov al, 0Ah
+	call WriteChar
+
+
+	mov AX, 12345
+	xor ecx, ecx
+L5:
+	xor dx, dx
+	div sestnast
+	;maska na prevod cislice na znak
+	or dl, 30h
+	;zapis znaku do pamate
+	mov buffer[ecx], dl
+	inc ecx
+	;kontrola ci koncim delenie - ak je podiel rovny 0
+	cmp ax, 0
+	je L6
+	jmp L5
+	;cyklus na vypis znakov v opacnom poradi
+L6:
+	mov al, buffer[ecx-1]
+	call WriteChar
+	loop L6
+
+	exit
+main ENDP
+
+END main

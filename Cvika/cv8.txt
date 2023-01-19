@@ -1,0 +1,115 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+
+Vygeneruj proto pMn: DWORD
+Vypis proto pMn: DWORD
+
+.data
+mn DWORD 0
+doplnok DWORD 0
+druhaMnozina DWORD 0
+prienik DWORD 0
+zjednotenie DWORD 0
+
+VypPrva BYTE "Prva mnozina: ",0
+VypDoplnok BYTE "Doplnok: ",0
+VypDruha BYTE "Druha mnozina: ",0
+VypPrienik BYTE "Prienik: ",0
+VypZjednotenie BYTE "Zjednotenie: ",0
+
+.code
+main PROC
+	call Clrscr
+
+	call Randomize
+
+	invoke Vygeneruj, offset mn
+
+	mov  edx, OFFSET VypPrva
+    call WriteString
+	invoke Vypis, mn
+
+	mov eax, mn
+
+	;doplnok
+	mov doplnok, eax
+	xor doplnok, 0FFFFFFFFh
+
+	mov  edx, OFFSET VypDoplnok
+    call WriteString
+	invoke Vypis, doplnok
+
+	;druhaMnozina
+	invoke Vygeneruj, offset druhaMnozina
+	mov  edx, OFFSET VypDruha
+    call WriteString
+	invoke Vypis, druhaMnozina
+
+	mov ebx, druhaMnozina
+
+	;prienik
+	mov prienik, ebx
+	and prienik, eax
+	mov  edx, OFFSET VypPrienik
+    call WriteString
+	invoke Vypis, prienik
+
+	;zjednotenie
+	mov zjednotenie, ebx
+	or zjednotenie, eax
+	mov  edx, OFFSET VypZjednotenie
+    call WriteString
+	invoke Vypis, zjednotenie
+
+
+	exit
+main ENDP
+
+Vygeneruj proc uses EAX EBX ECX EDX pMn: DWORD
+
+	mov ebx, pMn
+
+	mov edx, 10
+cyklus:
+	;vygeneruje cislo od 0 po 31, do cl
+	mov eax, 32
+	call RandomRange
+	mov cl, al
+
+	;do eax vlozi 1, posunie dolava o cl
+	mov eax, 1b
+	shl eax, cl
+
+	;prida z eax do mn
+	or [ebx], eax
+
+	;vypise mnozinu
+	invoke Vypis, [ebx]
+
+	dec edx
+	cmp edx, 0
+	ja cyklus
+
+	ret
+
+Vygeneruj endp
+
+
+Vypis proc uses EAX EBX ECX EDX pMn: DWORD
+
+	;vypise pMn
+	mov eax, pMn
+	call WriteBin
+
+	;print new line
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteChar
+
+	ret
+
+Vypis endp
+
+END main

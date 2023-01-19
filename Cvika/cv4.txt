@@ -1,0 +1,59 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+r BYTE 21 DUP(0)
+s BYTE 21 DUP(0)
+byteCount DWORD ?
+
+.code
+main PROC
+	call Clrscr
+
+	mov edx,OFFSET r
+	mov ecx,SIZEOF r
+	call ReadString
+	mov byteCount,eax ; number of characters
+
+	mov ebx, offset r
+	mov edx, offset s
+
+	mov esi, 0
+	mov edi, 0
+
+L1:
+	mov al, [ebx + esi] ;r[esi] 
+	mov cl, [ebx + esi + 1] ;r[esi + 1]
+
+	;porovanie ci je znak as
+	cmp al, "a"
+	jne L2
+	cmp cl, "s"
+	jne L2
+
+	;ak je as tak ho nahradi *
+	mov byte ptr [edx + edi], "*"
+	inc esi
+	inc esi
+	inc edi
+	jmp L3
+
+
+L2:
+	mov [edx + edi], al
+
+	inc esi
+	inc edi
+L3:
+
+	cmp al, 0
+	jne L1
+
+
+	mov edx, offset s
+	call WriteString
+
+	exit
+main ENDP
+
+END main

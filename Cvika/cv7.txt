@@ -1,0 +1,58 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+
+.data
+pole DW 550, 5, 85, 69, 724, 65, 34, 45
+min DW 0FFFFh
+index DD 0
+text BYTE "Najmensie cislo: ", 0
+
+.code
+main PROC
+	call Clrscr
+
+	mov ecx, lengthof pole
+
+	mov esi, 0
+Cyklus:
+	mov eax, 0
+	mov ax, pole[esi*2]
+	call WriteInt
+
+	cmp min, ax
+	jna Pokr
+	mov min, ax
+	mov index, esi
+Pokr:
+	inc esi
+	loop Cyklus
+
+
+	;novy riadok
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteChar
+
+	;vypis textu
+	mov edx,OFFSET text
+	call WriteString
+
+	;vypis min
+	mov eax, 0
+	mov ax, min
+	call WriteInt
+
+	exit
+main ENDP
+
+
+
+sort proc
+
+
+sort endp
+
+
+END main

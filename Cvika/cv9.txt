@@ -1,0 +1,128 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+
+.data
+pole DD 166, 172, 180, 183, 173, 195, 183, 182
+poleS DD 166, 172, 173, 180, 182, 183, 183, 195
+
+leng DD ?
+sum DD 0
+prm DD 0.0
+sth DD 0.0
+smod DD 0.0
+dva DB 2
+dvaDD DD 2
+pomoc DD 0
+
+VypStrednaHodnota BYTE "Stredna hodnota: ",0
+VypPriemer BYTE "Priemer: ",0
+VypSmerodnajnaOdchylka BYTE "Smerodajna odchylka: ",0
+
+
+.code
+main PROC
+	call Clrscr
+
+	mov leng, lengthof pole
+
+	mov ecx, 0 ;i
+cyklus:
+	mov eax, poleS[ecx * 4]
+	add sum, eax
+
+	inc ecx
+
+	cmp ecx, leng
+	jne cyklus
+
+	;priemer
+	finit
+	fild sum
+	fild leng
+	fdiv
+	fst prm
+	;call WriteFloat
+
+	;stredna hodnota
+	test leng, 1b
+	jz Parne
+Neparne:
+	mov eax, leng
+	div dva
+	mov ecx, 0
+	mov cl, al
+	mov eax, poleS[ecx * 4]
+	mov sth, eax
+	jmp PaNe
+Parne:
+	mov eax, leng
+	div dva
+	mov ecx, 0
+	mov cl, al
+	mov ebx, poleS[ecx * 4]
+	add ebx, poleS[ecx * 4 - 4]
+	mov pomoc, ebx
+	finit
+	fild pomoc
+	fild dvaDD
+	fdiv
+	fst sth
+	;call WriteFloat
+PaNe:
+
+	;smerodajna odchylka
+	mov ecx, 0 ;i
+cyklus2:
+	fild poleS[ecx * 4]
+	fld prm
+	fsub
+
+	inc ecx
+
+	cmp ecx, leng
+	jne cyklus2
+
+
+	mov edx, OFFSET VypPriemer
+    call WriteString
+	fld prm
+	call WriteFloat
+	;print new line
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteChar
+
+	mov edx, OFFSET VypStrednaHodnota
+    call WriteString
+	fld sth
+	call WriteFloat
+	;print new line
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteChar
+
+
+
+
+
+
+
+	;pytagorova veta
+	;finit
+	;fld a
+	;fld a
+	;fmul
+	;fld b
+	;fld b
+	;fmul
+	;fadd
+	;fsqrt
+	;call WriteFloat
+
+	exit
+main ENDP
+
+END main

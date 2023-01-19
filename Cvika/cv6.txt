@@ -1,0 +1,124 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+
+IntToStr Proto paCislo: WORD, paPointer: DWORD
+StrToInt Proto paPointer: DWORD, paCislo: WORD
+
+.data
+buffer DB 5 dup (0)
+
+.code
+main PROC
+	call Clrscr
+
+	invoke IntToStr, 12345, offset buffer
+	invoke StrToInt, offset buffer, 12544
+
+	mov EDX, offset Buffer
+	call WriteString
+
+	push 3
+	call Factorial
+
+	exit
+main ENDP
+
+
+IntToStr PROC uses EAX EBX ECX EDX paCislo: WORD, paPointer: DWORD
+Local delitel: WORD, tmpBuffer[5]: BYTE
+
+	mov delitel, 10
+
+	; ulozenie lubovolneho cisla do AX v rozmedzi od <0..65535>
+	mov AX, paCislo
+	mov EBX, paPointer
+
+	; ziskanie znakov postupnym celociselnym delenim desiatimi
+	xor ECX, ECX
+	xor ESI, ESI
+L10:
+	xor DX, DX
+	div delitel
+	; maska na prevod cislice na znak
+	or DL, 30h
+	cmp dl, 39h
+	jbe L11
+	add dl, 7
+L11:
+	; zapis znaku do pamate
+	mov tmpBuffer[ECX], dl
+	inc ECX
+	; kontrola, ci koncim delenie - ak je podiel rovny 0
+	cmp AX, 0
+	je L20
+	jmp L10
+	
+	; cyklus na vypis znakov v opacnom poradi
+L20:
+	mov al, tmpBuffer[ecx-1]
+	mov [EBX + ESI], al
+	inc ESI
+	loop L20
+
+	ret
+IntToStr ENDP
+
+StrToInt PROC uses EAX EBX ECX EDX paPointer: DWORD, paCislo: WORD
+Local delitel: WORD, tmpBuffer[5]: BYTE
+
+	mov ECX, 5
+	xor BX, BX
+	xor SI, SI
+L1:
+	; uvodne kontroly
+	call ReadChar
+	call WriteChar
+	cmp	al, 13
+	je ExitProgram
+	cmp al, '0'
+	jb WrongInput
+	cmp al, '9'
+	ja WrongInput
+
+	; maska na prevod znaku na desiatkovu cislicu, resp. cislo od 0..9
+	and AL, 0Fh
+
+	mov BL, AL
+	mov AX, SI
+	mul constant
+	add AX, BX
+	mov SI, AX
+
+	loop L1
+	
+	jmp ExitProgram
+
+WrongInput:
+	mov EDX, offset message1
+	call WriteString
+
+ExitProgram:
+	
+	mov AX, SI
+
+	ret
+StrToInt ENDP
+
+
+Factorial PROC
+
+	mov eax, [ESP + 4]
+	cmp eax, 0
+	ja L1
+	mov eax
+
+L1:
+	dec eax
+	push eax
+	call Factorial
+
+	ret
+Factorial ENDP
+
+END main

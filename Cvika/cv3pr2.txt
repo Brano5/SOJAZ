@@ -1,0 +1,69 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+buffer BYTE 21 DUP(0) ; input buffer
+prompt BYTE "Pocet vyskytov pismena je: ", 0
+byteCount DWORD ? ; holds counter
+count DWORD 0
+
+.code
+main PROC
+	call Clrscr
+
+	mov edx,OFFSET buffer ; point to the buffer
+	mov ecx,SIZEOF buffer ; specify max characters for ReadString
+	call ReadString ; input the string
+	mov byteCount,eax ; number of characters
+
+	call ReadChar
+	mov cl, al
+
+	xor esi, esi ; alebo: mov esi, 0
+L1:
+	mov al, buffer[esi]
+
+	cmp al, 0
+	je L2
+
+	cmp al, cl
+	jne L3
+	inc count
+L3:
+
+	call WriteChar
+
+	;call CRLF
+	mov bl, al
+
+	add buffer[esi], 1
+	mov al, buffer[esi]
+	add buffer[esi], -1
+	call WriteChar
+
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteCHar
+	mov al, bl
+
+	inc esi
+
+	jmp L1
+
+L2:
+
+
+	mov al, cl
+	call WriteChar
+
+	mov edx, offset prompt
+	call WriteString
+
+	mov eax, count
+	call WriteInt
+
+	exit
+main ENDP
+
+END main
