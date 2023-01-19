@@ -1,0 +1,113 @@
+TITLE MASM Template (main.asm)
+INCLUDE Irvine32.inc
+.data
+PocetBodov DB 54, 29, 36, 53, 23, 30, 44, 16, 30, 23
+PoetStriel DD 181, 95, 80, 102, 50, 66, 112, 36, 115, 107
+PocetGolov DD 26, 12, 14, 15, 14, 11, 19, 8, 16, 15
+PocetHracov EQU 10
+
+Alex DB "Alex", 0
+Elias DB "Elias", 0
+Gabriel DB "Gabriel", 0
+Jonathan DB "Jonathan", 0
+Marcus DB "Marcus", 0
+Mats DB "Mats", 0
+Mikko DB "Mikko", 0
+Paul DB "Paul", 0
+Ryan DB "Ryan", 0
+Sam DB "Sam", 0
+
+Mena DD Alex, Elias, Gabriel, Jonathan, Marcus, Mats, Mikko, Paul, Ryan, Sam
+
+AktualnyNajvyssiPocetBodov DB 0
+NajvyssiaPercentualnaStrelba DD 0.00
+Priemer DD 0
+Nasobenie DD 100
+Medzera DB " ", 0
+VypisPocetBodov DB "Najvyssi pocet kanadskych bodov: ", 0
+VypisPercenta DB "Najvyssia percentualna uspesnost strelby: ", 0
+
+; porovnávanie pre FPU bity C0
+C0 EQU 100h ;8-mi bit
+
+.code
+main PROC
+	call Clrscr
+
+	finit
+
+	mov ecx, PocetHracov
+	mov edi, 0
+	; ZISTUJE NAJVYSSI POCET BODOV
+ZistiNajvyssiPocetBodov:
+	mov al, PocetBodov[edi]
+	cmp al, AktualnyNajvyssiPocetBodov
+	ja ZapisNajvyssiPocetBodov
+	inc edi
+	loop ZistiNajvyssiPocetBodov
+
+ZapisNajvyssiPocetBodov:
+	cmp ecx, 0
+	je VypisKanBodov
+	mov AktualnyNajvyssiPocetBodov, al
+	mov edx, Mena[4*edi]
+	inc edi
+	loop ZistiNajvyssiPocetBodov
+
+VypisKanBodov:
+	push edx
+	mov edx, offset VypisPocetBodov
+	call WriteString
+	pop edx
+	call WriteString
+	call crlf
+	
+	mov ecx, PocetHracov
+	mov edi, 0
+SpocitajPriemery:
+	fild PocetGolov[4*edi]
+	fild PoetStriel[4*edi]
+	fdiv
+	fild Nasobenie
+	fmul
+
+	;VYPIS MENA
+	mov edx, Mena[4*edi]
+	call WriteString
+
+	;VYPIS MEDZERY
+	mov al, Medzera
+	call WriteChar
+
+	;VYPIS PRIEMERU
+	call WriteFloat
+	call crlf
+
+	fcom NajvyssiaPercentualnaStrelba
+	fstsw ax ; DO AX SI DAM STAVOVY REGISTER
+	test ax, C0	; POROVNAVANIE
+	jz NajvyssiPriemer
+
+	fistp Priemer
+	inc edi
+	loop SpocitajPriemery
+
+	NajvyssiPriemer:
+		cmp ecx, 0
+		je VypisPercentualnehoHraca
+		fstp NajvyssiaPercentualnaStrelba ;VYBERAM ABY SOM POTOM MOHOL POROVNAVAT OSTATNE
+		mov ebx, Mena[4*edi]
+		inc edi
+		loop SpocitajPriemery
+
+VypisPercentualnehoHraca:
+	;VYPIS HRACA S NAJVYSSOU PERCENTUALNOU USPESNOSTOU STRELBY
+	mov edx, offset VypisPercenta
+	call WriteString
+	mov edx, ebx
+	call WriteString
+
+Koniec:
+	exit
+main ENDP
+END main

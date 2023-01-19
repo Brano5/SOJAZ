@@ -1,0 +1,74 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+Retazec DB 16 dup(?)
+RetazecSplna DB "Splna",0ah, 0dh, 0
+RetazecChyba DB "Nesplna",0ah, 0ah, 0
+
+
+.code
+main PROC
+	mov ecx, 20
+	mov edx, Offset Retazec
+	call ReadString
+	mov al, [edx+edi]
+	inc edi
+	cmp al, 0
+	je Nesplna
+	Zaciatok:
+	cmp al, '('
+	je Zatvorka
+	jmp Nesplna
+
+	Zatvorka:
+	Pokracuj:
+	mov al, [edx+edi]
+	inc edi
+	cmp al, 'a'
+	jge Pokracuj1
+	jb Overenie
+
+
+
+	Pokracuj1:
+	cmp al, 'z'
+	jbe Pokracuj
+	jmp Overenie
+
+	Overenie:
+	cmp al, '('
+	je Zatvorka
+	cmp al, ')'
+	je Koniec
+	jmp Overenie1
+
+	Overenie1:
+	cmp al, 0
+	je Nesplna
+	jmp Zaciatok
+
+	
+	Koniec:
+	mov al, [edx+edi]
+	cmp al, 0
+	je Splna
+	jmp Pokracuj
+
+
+
+	Nesplna:
+	mov edx, offset RetazecChyba
+	call WriteString
+	exit
+
+
+	Splna:
+	mov edx, offset RetazecSplna
+	call WriteString
+	exit
+
+	exit
+main ENDP
+
+END main

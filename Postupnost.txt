@@ -1,0 +1,87 @@
+Definujte v pamati postupnost kladnych cisel typu WORD. Pre každé číslo vypíšte koľko čísel v postupnosti
+je od neho menších. Napr: 62, 31, 84, 96, 19, 47 dá výstup: 3, 1, 4, 5, 0, 2
+Upravte program, tak  aby postupnost vygenerovala hodnoty z procedury RandomRange
+Vypocitajte a vypiste priemer postupnosti
+--------------------------------------------------------------------------------------------
+
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+postupnost WORD 62, 31, 84, 96, 19, 47
+velkost WORD 6
+myMessage BYTE "Assembly language program example",0Ah,0
+spolu WORD 0
+
+.code
+main PROC
+	call Clrscr
+
+	call Randomize
+
+	mov ecx, 0
+generovanie:
+	mov eax, 99
+	call RandomRange
+	inc eax
+	mov postupnost[ecx], ax
+	call WriteInt
+
+	inc ecx
+	cmp cx, velkost
+	jb generovanie
+
+
+	;print new line
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteChar
+
+
+	mov ebx, 0
+	mov ecx, 0
+
+	mov cx, 0
+prechod:
+	mov bx, postupnost[ecx * 2]
+
+	mov eax, 0
+	mov edx, 0
+
+	kontrola:
+		cmp postupnost[edx * 2], bx
+		jae dalsi
+
+		inc ax
+	dalsi:
+		inc dx
+		cmp dx, velkost
+		jb kontrola
+
+	inc cx
+	call WriteInt
+	add spolu, ax
+
+	cmp cx, velkost
+	jb prechod
+
+
+	;print new line
+	mov al, 10
+	call WriteChar
+	mov al, 13
+	call WriteChar
+
+
+	finit
+	fild spolu
+	fild velkost
+	fdiv
+	call WriteFloat
+
+
+	exit
+main ENDP
+
+END main

@@ -1,0 +1,77 @@
+TITLE MASM Template						(main.asm)
+
+INCLUDE Irvine32.inc
+.data
+
+Data1 DW  0
+Data2 DW  0
+Data3 DW  0
+Data4 DW    0
+Delenie DW  2   ;delenie dvojka
+
+SpravaObvod DB "Obvod trojuholnika je: ", 0Ah,0Dh,0
+SpravaSedi DB "Sucet prveho a druheho je mensi ako tretie" , 0Ah,0Dh,0
+SpravaNesedi DB "Sucet prveho a druheho je vacsi ako tretie", 0Ah,0Dh,0
+SpravaVyska DB "Zadaj vysku trojuholnika: ", 0Ah,0Dh,0
+
+.code
+main PROC
+
+Call ReadInt        ; nacita z konzoly
+mov Data1, ax
+Call ReadInt
+mov Data2, ax
+Call ReadInt
+mov Data3, ax
+
+mov ebx,0   ;vynulujem ebx
+
+add bx, Data1   ;zratam bx a prvecislo
+add bx, Data2   ;zratam bx a druhecislo
+cmp bx, Data3   ;porovnam bx s tretim
+ja Vypocet         ;ak vacsie To tretie skacem na vypocet
+jb NebudePocitat    ;ak je rovne nebude pocitat
+
+
+Vypocet:                        ;vypocet obvodu len zdrata bx s tretou hodnotou priradi a vypise
+mov edx, offset SpravaNesedi      ;ale najskôr vyhodí spravu ze sucet je mensi 
+Call WriteString
+add bx, Data3               ;este prirata k bx aj To tretie
+mov ax, bx              ;priradi Do ax a vypise
+mov edx, offset SpravaObvod
+Call WriteString
+Call writeInt
+jmp Obsah
+
+NebudePocitat:              ;iba vypis ze nerata
+mov edx, offset SpravaSedi
+Call WriteString
+jmp Koniec
+
+Obsah:
+
+mov edx, offset SpravaVyska
+Call WriteString
+mov ebx, 0Ah            ;skoci o riadok nizsie 
+Call WriteChar
+Call ReadInt
+mov Data4, ax       ;nacitam vysku trojuholnika
+
+finit            
+fild Data3      ;priradim cko
+fild Data4      ;priradim vysku
+fmul            ;vynasobim
+fild Delenie    ;pridam dvojku co je hore
+fdiv            ;vydelim
+
+Call WriteFloat ;vypisem
+
+jmp Koniec
+
+Koniec:
+
+
+Exit
+main ENDP
+
+End main
